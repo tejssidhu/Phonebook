@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Phonebook.Domain.Model.Contact>
+﻿@model Guid
 
 @{
     ViewBag.Title = "My Contacts";
@@ -9,70 +9,104 @@
 
 <p>Use the form below to search your contacts.</p>
 
-<div class="row">
-    <div class="col-md-10 col-md-offset-1">
-    @using (Html.BeginForm("Search", "Contact", null, FormMethod.Post, new { @class = "form-horizontal" }))
-    {
-        <div class="form-group">
-            @Html.AntiForgeryToken()
-            @Html.ValidationSummary()
+<div data-ng-controller="contactController" class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <strong class="error">{{error}}</strong>
+            <input type="hidden" data-ng-model="newcontact.UserId" value="@Model"/>
 
-            <input type="hidden" name="UserId" id="UserId" value="@ViewBag.UserId" />
-            
-            <div class="form-group">
-                <label for="Name" class="col-md-2 control-label">Name</label>
-                <div class="col-md-8">
-                    <input type="text" placeholder="Name" id="Name" name="Name" class="form-control" />
-                </div>
-            </div>
+            <p data-ng-hide="addMode"><a data-ng-click="toggleAdd()" href="javascript:;" class="btn btn-xs btn-primary">Add new Contact</a></p>
 
-            <div class="form-group">
-                <label for="Email" class="col-md-2 control-label">Email</label>
-                <div class="col-md-8">
-                    <input type="text" placeholder="Email" id="Email" name="Email" class="form-control" />
+            <form name="addContact" data-ng-show="addMode" style="width: 600px; margin: 0px auto;">
+                <div class="form-group">
+                    <label for="cTitle" class="col-md-2 control-label">Title:</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="cTitle" placeholder="Title" data-ng-model="newcontact.Title"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-8">
-                    <button type="submit" class="btn btn-primary">Search</button> 
-                    @Html.ActionLink("Clear", "Index", new { UserId = ViewBag.UserId }, new { @class = "btn btn btn-default" })
+                <div class="form-group">
+                    <label for="cForename" class="col-md-2 control-label">Forename:</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="cForename" placeholder="Forename" data-ng-model="newcontact.Forename"/>
+                    </div>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <label for="cSurname" class="col-md-2 control-label">Surname:</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="cSurname" placeholder="Surname" data-ng-model="newcontact.Surname"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cEmail" class="col-md-2 control-label">Email:</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="cEmail" placeholder="Email" data-ng-model="newcontact.Email" required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-primary" data-ng-click="add()" data-ng-disabled="!addContact.$valid">Save</button>
+                        <input type="button" value="Cancel" data-ng-click="toggleAdd()" class="btn btn-default"/>
+                    </div>
+                </div>
+            </form>
         </div>
-    }
     </div>
-</div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <br/>
+            <br/>
+        </div>
+    </div>
 
-<div class="col-md-10 col-md-offset-1">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.Title)</th>
-                <th>@Html.DisplayNameFor(model => model.Forename)</th>
-                <th>@Html.DisplayNameFor(model => model.Surname)</th>
-                <th>@Html.DisplayNameFor(model => model.Email)</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Forename)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Surname)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                    <td>
-                        @Html.ActionLink("View Contact Numbers", "Index", "ContactNumber", new { ContactId = item.Id, UserId = ViewBag.UserId }, new { @class = "btn btn-xs btn-default" }) 
-                        @Html.ActionLink("Edit", "ManageContact", new { ContactId = item.Id, UserId = ViewBag.UserId }, new { @class = "btn btn-xs btn-default" }) 
-                        @Html.ActionLink("Delete", "DeleteContact", new { ContactId = item.Id, UserId = ViewBag.UserId}, new { @class = "btn btn-xs btn-danger", onclick = "return confirm('Are you sure you want to delete this contact?');" })
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <p>@Html.ActionLink("Add New Contact", "ManageContact", new { ContactId = Guid.Empty, UserId = ViewBag.UserId }, new { @class = "btn btn-xs btn-primary" })</p>
-
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Forename</th>
+                        <th>Surname</th>
+                        <th>Email</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="contact in contacts">
+                        <td><strong data-ng-hide="contact.editMode">{{ contact.Id }}</strong><input type="hidden" data-ng-model="contact.UserId" /><input type="hidden" data-ng-model="contact.Id" /></td>
+                        <td>
+                            <p data-ng-hide="contact.editMode">{{ contact.Title }}</p>
+                            <input data-ng-show="contact.editMode" type="text" data-ng-model="contact.Title"/>
+                        </td>
+                        <td>
+                            <p data-ng-hide="contact.editMode">{{ contact.Forename }}</p>
+                            <input data-ng-show="contact.editMode" type="text" data-ng-model="contact.Forename"/>
+                        </td>
+                        <td>
+                            <p data-ng-hide="contact.editMode">{{ contact.Surname }}</p>
+                            <input data-ng-show="contact.editMode" type="text" data-ng-model="contact.Surname"/>
+                        </td>
+                        <td>
+                            <p data-ng-hide="contact.editMode">{{ contact.Email }}</p>
+                            <input data-ng-show="contact.editMode" type="text" data-ng-model="contact.Email"/>
+                        </td>
+                        <td>
+                            <p data-ng-hide="contact.editMode">
+                                <a data-ng-click="toggleEdit(contact)" href="javascript:;">Edit</a> |
+                                <a data-ng-click="deleteContact(contact)" href="javascript:;">Delete</a>
+                            </p>
+                            <p data-ng-show="contact.editMode">
+                                <a data-ng-click="save(contact)" href="javascript:;">Save</a> | 
+                                <a data-ng-click="toggleEdit(contact)" href="javascript:;">Cancel</a>
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

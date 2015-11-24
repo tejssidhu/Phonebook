@@ -43,6 +43,9 @@ namespace Phonebook.UI
                         "~/Content/themes/base/jquery.ui.theme.css"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Scripts/bootstrap.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/angular").Include("~/Scripts/angular.js"));
+            bundles.Add(new ScriptBundle("~/bundles/appjs").Include("~/Scripts/app/phonebook.js"));
         }
     }
 }

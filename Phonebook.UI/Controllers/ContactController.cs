@@ -19,10 +19,7 @@ namespace Phonebook.UI.Controllers
 
         public ActionResult Index(Guid userId)
         {
-            var contacts = _contactService.GetAllByUserId(userId);
-            ViewBag.UserId = userId;
-
-            return View(contacts);
+            return View(userId);
         }
 
         public ActionResult Search(SearchViewModel viewModel)
