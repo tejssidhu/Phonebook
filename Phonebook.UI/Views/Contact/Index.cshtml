@@ -12,9 +12,9 @@
 <div data-ng-controller="contactController" class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <strong class="warning">{{error}}</strong>
+            <strong class="has-error">{{error}}</strong>
 
-            <p data-ng-hide="addMode"><a data-ng-click="toggleAdd()" href="javascript:;" class="btn btn-xs btn-primary">Add new Contact</a></p>
+            <p data-ng-hide="addMode"><a data-ng-click="toggleAdd()" href="javascript:;" class="btn btn-xs btn-primary">Add New Contact</a></p>
 
             <form name="addContact" data-ng-show="addMode" class="form-horizontal">
                 <input type="hidden" data-ng-model="newcontact.UserId" value="@Model"/>
@@ -49,8 +49,8 @@
 
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-8">
-                        <button type="submit" class="btn btn-primary" data-ng-click="add()" data-ng-disabled="!addContact.$valid">Save</button>
-                        <input type="button" value="Cancel" data-ng-click="toggleAdd()" class="btn btn-default"/>
+                        <button type="submit" class="btn btn-xs btn-warning" data-ng-click="add()" data-ng-disabled="!addContact.$valid">Save</button>
+                        <input type="button" value="Cancel" data-ng-click="toggleAdd()" class="btn btn-xs btn-secondary" />
                     </div>
                 </div>
             </form>
@@ -96,12 +96,13 @@
                         </td>
                         <td>
                             <p data-ng-hide="contact.editMode">
-                                <a data-ng-click="toggleEdit(contact)" href="javascript:;">Edit</a> |
-                                <a data-ng-click="deleteContact(contact)" href="javascript:;">Delete</a>
+                                <a href="/ContactNumber?ContactId={{contact.Id}}" class="btn btn-xs btn-default">View Contact Numbers</a> 
+                                <a data-ng-click="toggleEdit(contact)" href="javascript:;" class="btn btn-xs btn-primary">Edit</a> 
+                                <a data-ng-click="deleteContact(contact)" href="javascript:;" class="btn btn-xs btn-danger">Delete</a>
                             </p>
                             <p data-ng-show="contact.editMode">
-                                <a data-ng-click="save(contact)" href="javascript:;">Save</a> | 
-                                <a data-ng-click="toggleEdit(contact)" href="javascript:;">Cancel</a>
+                                <a data-ng-click="save(contact)" href="javascript:;" class="btn btn-xs btn-warning">Save</a> | 
+                                <a data-ng-click="toggleEdit(contact)" href="javascript:;" class="btn btn-xs btn-secondary">Cancel</a>
                             </p>
                         </td>
                     </tr>

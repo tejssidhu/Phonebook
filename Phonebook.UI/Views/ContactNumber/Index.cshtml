@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Phonebook.Domain.Model.ContactNumber>
+﻿@model Guid
 
 @{
     ViewBag.Title = "Contact Numbers - For " + @ViewBag.ContactName;
@@ -6,32 +6,83 @@
 }
 
 <p>&nbsp;</p>
-<div class="page-header"><h2>Contact Numbers - For @ViewBag.ContactName</h2></div>
+<div class="page-header"><h2>Contact Numbers - put in contact name here</h2></div>
 
-<div class="col-md-10 col-md-offset-1">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>@Html.DisplayNameFor(model => model.Description)</th>
-                <th>@Html.DisplayNameFor(model => model.TelephoneNumber)</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model) {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                <td>@Html.DisplayFor(modelItem => item.TelephoneNumber)</td>
-                <td>
-                    @Html.ActionLink("Edit", "ManageContactNumber", new { ContactNumberId = item.Id, ContactId = item.ContactId }, new { @class = "btn btn-xs btn-default" }) 
-                    @Html.ActionLink("Delete", "DeleteContactNumber", new { ContactNumberId = item.Id, ContactId = item.ContactId }, new { @class = "btn btn-xs btn-danger", onclick = "return confirm('Are you sure you want to delete this contact number?');" })
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
+<div data-ng-controller="contactNumberController" class="container">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <strong class="has-error">{{error}}</strong>
 
-    <p>@Html.ActionLink("Add New Contact Number", "ManageContactNumber", new { ContactNumberId = Guid.Empty, ContactId = ViewBag.ContactId }, new { @class = "btn btn-xs btn-primary" }) @Html.ActionLink("Back to Contacts", "Index", "Contact", new { UserId = ViewBag.UserId }, new { @class = "btn btn-xs btn-link" })</p>
+            <p data-ng-hide="addMode"><a data-ng-click="toggleAdd()" href="javascript:;" class="btn btn-xs btn-primary">Add New Contact Number</a></p>
 
+            <form name="addContactNumber" data-ng-show="addMode" class="form-horizontal">
+                <input type="hidden" data-ng-model="newcontactnumber.ContactId" value="@Model"/>
+
+                <div class="form-group">
+                    <label for="cDescription" class="col-md-2 control-label">Description:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="cDescription" placeholder="Description" data-ng-model="newcontactnumber.Description" required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cTelephoneNumber" class="col-md-2 control-label">Telephone Number:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="cTelephoneNumber" placeholder="TelephoneNumber" data-ng-model="newcontactnumber.TelephoneNumber" required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-8">
+                        <button type="submit" class="btn btn-xs btn-warning" data-ng-click="add()" data-ng-disabled="!addContactNumber.$valid">Save</button>
+                        <input type="button" value="Cancel" data-ng-click="toggleAdd()" class="btn btn-xs btn-secondary" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <br/>
+            <br/>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Telephone Number</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="contactNumber in contactNumbers">
+                        <td>
+                            <p data-ng-hide="contactNumber.editMode">{{ contactNumber.Description }}</p>
+                            <input data-ng-show="contactNumber.editMode" type="text" data-ng-model="contactNumber.Description" required/>
+                        </td>
+                        <td>
+                            <p data-ng-hide="contactNumber.editMode">{{ contactNumber.TelephoneNumber }}</p>
+                            <input data-ng-show="contactNumber.editMode" type="text" data-ng-model="contactNumber.TelephoneNumber" required/>
+                        </td>
+                        <td>
+                            <p data-ng-hide="contactNumber.editMode">
+                                <a data-ng-click="toggleEdit(contactNumber)" href="javascript:;" class="btn btn-xs btn-primary">Edit</a> |
+                                <a data-ng-click="deleteContact(contactNumber)" href="javascript:;" class="btn btn-xs btn-danger">Delete</a>
+                            </p>
+                            <p data-ng-show="contactNumber.editMode">
+                                <a data-ng-click="save(contactNumber)" href="javascript:;" class="btn btn-xs btn-warning">Save</a> |
+                                <a data-ng-click="toggleEdit(contactNumber)" href="javascript:;" class="btn btn-xs btn-secondary" >Cancel</a>
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-

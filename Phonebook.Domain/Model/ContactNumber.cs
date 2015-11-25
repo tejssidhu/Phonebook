@@ -6,7 +6,6 @@ namespace Phonebook.Domain.Model
 {
     public class ContactNumber
     {
-        [Required]
         public Guid Id { get; set; }
         
         [Required]
