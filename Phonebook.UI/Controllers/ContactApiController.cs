@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Newtonsoft.Json.Linq;
 using Phonebook.Domain.Interfaces.Services;
 using Phonebook.Domain.Model;
-using Phonebook.UI.Models;
 
 namespace Phonebook.UI.Controllers
 {
@@ -43,7 +41,14 @@ namespace Phonebook.UI.Controllers
 
             if (user != null)
             {
-                return _contactService.Get((Guid)itemId);
+                var contact = _contactService.Get(itemId);
+
+                if (contact == null)
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
+
+                return contact;
             }
 
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
@@ -54,24 +59,32 @@ namespace Phonebook.UI.Controllers
         {
             var httpResponse = new HttpResponseMessage();
 
-            User user = _userService.Get(newContact.UserId);
-
-            if (user != null)
+            if (ModelState.IsValid)
             {
-                try
+                User user = _userService.Get(newContact.UserId);
+
+                if (user != null)
                 {
-                    _contactService.Create(newContact);
-                    httpResponse.StatusCode = HttpStatusCode.Created;
-                    //httpResponse.Headers.Location = need to set Uri of new resource
+                    try
+                    {
+                        _contactService.Create(newContact);
+                        httpResponse = Request.CreateResponse(HttpStatusCode.Created, newContact);
+                        httpResponse.Headers.Location = new Uri(Url.Link("DefaultDoubleGuidApi", new { id = newContact.UserId, itemId = newContact.Id}));
+
+                        return httpResponse;
+                        //httpResponse.Headers.Location = need to set Uri of new resource
+                    }
+                    catch (Exception ex)
+                    {
+                        return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
+                    }
                 }
-                catch (Exception)
-                {
-                    httpResponse.StatusCode = HttpStatusCode.BadRequest;
-                }
+
+                httpResponse.StatusCode = HttpStatusCode.Unauthorized;
             }
             else
             {
-                httpResponse.StatusCode = HttpStatusCode.Unauthorized;
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             return httpResponse;
@@ -80,6 +93,16 @@ namespace Phonebook.UI.Controllers
         // PUT api/<controller>/5
         public HttpResponseMessage Put(Guid id, [FromBody]Contact existingContact)
         {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            }
+
+            if (id != existingContact.Id)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
             var httpResponse = new HttpResponseMessage();
 
             User user = _userService.Get(existingContact.UserId);
@@ -99,9 +122,9 @@ namespace Phonebook.UI.Controllers
                     else
                         httpResponse.StatusCode = HttpStatusCode.NotFound;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    httpResponse.StatusCode = HttpStatusCode.BadRequest;
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
                 }
             }
             else
@@ -113,9 +136,32 @@ namespace Phonebook.UI.Controllers
         }
 
         // DELETE api/<controller>/5
-        public void Delete(Guid id)
+        public HttpResponseMessage Delete(Guid id)
         {
-            _contactService.Delete(id);
+            Contact contact = _contactService.Get(id);
+
+            if (contact == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            try
+            {
+                _contactService.Delete(id);
+
+                return Request.CreateResponse(HttpStatusCode.OK, contact);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, ex);
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _contactService.Dispose();
+            _userService.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }

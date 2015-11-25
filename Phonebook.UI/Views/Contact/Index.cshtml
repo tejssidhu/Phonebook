@@ -12,42 +12,43 @@
 <div data-ng-controller="contactController" class="container">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <strong class="error">{{error}}</strong>
-            <input type="hidden" data-ng-model="newcontact.UserId" value="@Model"/>
+            <strong class="warning">{{error}}</strong>
 
             <p data-ng-hide="addMode"><a data-ng-click="toggleAdd()" href="javascript:;" class="btn btn-xs btn-primary">Add new Contact</a></p>
 
-            <form name="addContact" data-ng-show="addMode" style="width: 600px; margin: 0px auto;">
+            <form name="addContact" data-ng-show="addMode" class="form-horizontal">
+                <input type="hidden" data-ng-model="newcontact.UserId" value="@Model"/>
+
                 <div class="form-group">
                     <label for="cTitle" class="col-md-2 control-label">Title:</label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                         <input type="text" class="form-control" id="cTitle" placeholder="Title" data-ng-model="newcontact.Title"/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="cForename" class="col-md-2 control-label">Forename:</label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                         <input type="text" class="form-control" id="cForename" placeholder="Forename" data-ng-model="newcontact.Forename"/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="cSurname" class="col-md-2 control-label">Surname:</label>
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                         <input type="text" class="form-control" id="cSurname" placeholder="Surname" data-ng-model="newcontact.Surname"/>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="cEmail" class="col-md-2 control-label">Email:</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" id="cEmail" placeholder="Email" data-ng-model="newcontact.Email" required/>
+                    <div class="col-md-8">
+                        <input type="email" class="form-control" id="cEmail" placeholder="Email" data-ng-model="newcontact.Email" required />
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
+                    <div class="col-md-offset-2 col-md-8">
                         <button type="submit" class="btn btn-primary" data-ng-click="add()" data-ng-disabled="!addContact.$valid">Save</button>
                         <input type="button" value="Cancel" data-ng-click="toggleAdd()" class="btn btn-default"/>
                     </div>
@@ -77,7 +78,6 @@
                 </thead>
                 <tbody>
                     <tr data-ng-repeat="contact in contacts">
-                        <td><strong data-ng-hide="contact.editMode">{{ contact.Id }}</strong><input type="hidden" data-ng-model="contact.UserId" /><input type="hidden" data-ng-model="contact.Id" /></td>
                         <td>
                             <p data-ng-hide="contact.editMode">{{ contact.Title }}</p>
                             <input data-ng-show="contact.editMode" type="text" data-ng-model="contact.Title"/>

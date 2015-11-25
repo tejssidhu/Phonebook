@@ -47,7 +47,6 @@ function getUrlVars() {
             this.newcontact.UserId = $scope.UserId;
 
             $http.post('/api/ContactApi/', this.newcontact).success(function (data) {
-                alert("Added Successfully!!");
                 $scope.addMode = false;
                 $scope.contacts.push(data);
                 $scope.loading = false;
@@ -59,12 +58,9 @@ function getUrlVars() {
 
         //edit Contact
         $scope.save = function () {
-            alert("Edit");
             $scope.loading = true;
             var con = this.contact;
-            alert(con);
             $http.put('/api/ContactApi/' + con.Id, con).success(function (data) {
-                alert("Saved Successfully!!");
                 con.editMode = false;
                 $scope.loading = false;
             }).error(function (data) {
@@ -78,7 +74,6 @@ function getUrlVars() {
             $scope.loading = true;
             var Id = this.contact.Id;
             $http.delete('/api/ContactApi/' + Id).success(function (data) {
-                alert("Deleted Successfully!!");
                 $.each($scope.contact, function (i) {
                     if ($scope.contacts[i].Id === Id) {
                         $scope.contacts.splice(i, 1);
