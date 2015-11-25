@@ -8,6 +8,7 @@ using Phonebook.Domain.Model;
 
 namespace Phonebook.UI.Controllers
 {
+    [Authorize]
     public class ContactApiController : ApiController
     {
         private readonly IContactService _contactService;
